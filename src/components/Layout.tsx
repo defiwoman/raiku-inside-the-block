@@ -39,8 +39,8 @@ export function Layout() {
           <NavLink to="/tutorial">How to play</NavLink>
           <NavLink to="/about">About</NavLink>
         </nav>
-        <Link className="header-play" to="/game">
-          Enter the block{" "}
+        <Link className="header-play" to="/tutorial">
+          Enter the Block{" "}
           <span aria-hidden="true">
             <Arrow />
           </span>

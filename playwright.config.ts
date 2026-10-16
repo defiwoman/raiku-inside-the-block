@@ -23,6 +23,14 @@ export default defineConfig({
       name: "mobile",
       use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
     },
+    {
+      name: "narrow",
+      use: {
+        ...devices["iPhone 13"],
+        viewport: { width: 360, height: 800 },
+        defaultBrowserType: "chromium",
+      },
+    },
   ],
   webServer: {
     command: "npm run preview -- --port 4173 --strictPort",

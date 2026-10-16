@@ -73,10 +73,15 @@ export function About() {
           <section>
             <h2>Your progress stays with you.</h2>
             <p>
-              Only your personal progress—run count, best learning score, and
+              Only your personal progress—your optional display name, tutorial
+              choice and replay position, run count, best learning score, and
               last run—is saved in this browser’s localStorage. No account or
               server receives it. The share card is generated and downloaded on
               your device.
+            </p>
+            <p>
+              Clearing progress also removes your optional name and tutorial
+              progress.
             </p>
             <button
               className="text-link"

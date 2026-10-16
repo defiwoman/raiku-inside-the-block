@@ -4,12 +4,14 @@ import { BlockScene } from "../components/BlockScene";
 import { missions, simulate } from "../lib/simulation";
 import type { Choices, MissionIndex } from "../lib/simulation";
 import { saveRun } from "../lib/progress";
+import { readOnboarding } from "../lib/onboarding";
 
 export function Game() {
   const [step, setStep] = useState<MissionIndex>(0);
   const [choices, setChoices] = useState<Choices>(["", "", ""]);
   const navigate = useNavigate();
   const mission = missions[step];
+  const { displayName } = readOnboarding();
   const selected = choices[step];
   function next() {
     if (!selected) return;
@@ -31,7 +33,11 @@ export function Game() {
       </div>
       <div className="game-heading">
         <div>
-          <p className="eyebrow">YOUR OPPORTUNITY STARTS HERE</p>
+          <p className="eyebrow">
+            {displayName
+              ? `YOUR MOVE, ${displayName}`
+              : "YOUR OPPORTUNITY STARTS HERE"}
+          </p>
           <h1>Inside the block.</h1>
         </div>
         <button

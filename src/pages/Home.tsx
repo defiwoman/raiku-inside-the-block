@@ -1,142 +1,166 @@
-import { Arrow } from "../components/Arrow";
 import { Link } from "react-router-dom";
-import { BlockScene } from "../components/BlockScene";
-import { missions } from "../lib/simulation";
+import { Arrow } from "../components/Arrow";
+import { LandingBlock } from "../components/LandingBlock";
+import { Glossary } from "../components/Glossary";
 import { readProgress } from "../lib/progress";
+import { readOnboarding } from "../lib/onboarding";
+
+const introduction = [
+  {
+    name: "SEE",
+    question: "When does your strategy learn what happened?",
+    detail:
+      "Start with an event that has already executed. Then follow the information to you.",
+  },
+  {
+    name: "ACT",
+    question: "Is the opportunity still worth taking?",
+    detail:
+      "Take a breath, check what has changed, and choose whether to act or pass.",
+  },
+  {
+    name: "LAND",
+    question: "What happens when your transaction reaches execution?",
+    detail:
+      "See why being included in a block and executing successfully are different things.",
+  },
+];
 
 export function Home() {
   const progress = readProgress();
+  const onboarding = readOnboarding();
   return (
     <>
-      <section className="home-hero page-width">
+      <section className="home-hero landing-hero page-width">
         <div className="hero-copy">
           <p className="eyebrow">
-            <span className="small-cross">+</span> A GAME OF TIMING &
-            POSSIBILITY
+            <span className="small-cross" aria-hidden="true">
+              +
+            </span>{" "}
+            A community experience exploring Raiku
           </p>
           <h1>
-            Same market.
+            Inside
             <br />
-            Different
-            <br />
-            <span className="serif-accent">moment.</span>
+            the Block
           </h1>
+          <h2 className="hero-headline">
+            You spotted the opportunity. Can your strategy act in time?
+          </h2>
           <p className="hero-description">
-            A signal. A decision. A place in the block.
-            <br className="desktop-break" /> Step inside and discover how the
-            pieces connect.
+            Explore how information, decisions, and execution shape a trade—in a
+            short interactive simulation.
           </p>
           <div className="hero-actions">
             <Link to="/tutorial" className="button primary">
-              Let’s play{" "}
-              <span aria-hidden="true">
-                <Arrow />
-              </span>
+              Enter the Block <Arrow />
             </Link>
-            <span className="time-note">
-              <span aria-hidden="true">◷</span> 3 MISSIONS · ~3 MINUTES
-            </span>
+            <a href="#how-it-works" className="button secondary">
+              How it works <span aria-hidden="true">↓</span>
+            </a>
           </div>
           <p className="hero-small">
-            No wallet. No real trades. Just a new perspective.
+            <span className="small-cross" aria-hidden="true">
+              +
+            </span>{" "}
+            Play as a guest · No wallet · About 3 minutes
           </p>
         </div>
         <div className="hero-visual">
-          <BlockScene />
-          <div className="visual-caption">
-            <span>AN OPPORTUNITY IS ONLY THE BEGINNING.</span>
-            <span>
-              FIG. 01 <Arrow />
-            </span>
-          </div>
+          <LandingBlock />
+          <p className="landing-illustration-note">
+            An illustration of an already-executed event. Not a live feed or a
+            performance benchmark.
+          </p>
         </div>
-      </section>
-      <section className="intro-strip page-width">
-        <div>
-          <span className="small-cross">+</span>
-          <span>UNDER THE SURFACE</span>
-        </div>
-        <p>
-          Markets move fast.
-          <br />
-          <strong>Understanding them starts here.</strong>
-        </p>
-        <p>
-          Follow one simulated opportunity from the first observation to the
-          next block. Your choices shape the journey.
-        </p>
       </section>
       <section
-        className="missions-section page-width"
-        aria-labelledby="missions-title"
+        id="how-it-works"
+        className="page-width landing-introduction"
+        aria-labelledby="intro-title"
+        tabIndex={-1}
       >
         <div className="section-heading">
-          <h2 id="missions-title">Three moments that matter.</h2>
-          <span className="eyebrow">ONE BLOCK. YOUR CALL.</span>
+          <div>
+            <p className="eyebrow">THE JOURNEY, IN THREE PARTS</p>
+            <h2 id="intro-title">An opportunity is only the beginning.</h2>
+          </div>
+          <span className="mono">01 — 02 — 03</span>
         </div>
-        <div className="mission-cards">
-          {missions.map((mission, index) => (
-            <Link
-              to={`/tutorial?step=${index}`}
-              className="mission-card"
-              key={mission.id}
-            >
-              <div className="card-top">
-                <span className="mono">MISSION 0{index + 1}</span>
-                <span className="card-arrow" aria-hidden="true">
-                  <Arrow />
-                </span>
+        <div className="intro-cards">
+          {introduction.map((item, index) => (
+            <article className="intro-card" key={item.name}>
+              <div className="intro-card-top">
+                <span className="mono">0{index + 1}</span>
+                <div
+                  className={`mission-symbol symbol-${index}`}
+                  aria-hidden="true"
+                >
+                  {index === 0 ? (
+                    <>
+                      <i />
+                      <i />
+                      <i />
+                      <b />
+                    </>
+                  ) : index === 1 ? (
+                    <>
+                      <i />
+                      <i />
+                      <i />
+                    </>
+                  ) : (
+                    <>
+                      <i />
+                      <i />
+                      <i />
+                      <i />
+                    </>
+                  )}
+                </div>
               </div>
-              <div
-                className={`mission-symbol symbol-${index}`}
-                aria-hidden="true"
-              >
-                {index === 0 ? (
-                  <>
-                    <i />
-                    <i />
-                    <i />
-                    <b />
-                  </>
-                ) : index === 1 ? (
-                  <>
-                    <i />
-                    <i />
-                    <i />
-                  </>
-                ) : (
-                  <>
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                  </>
-                )}
-              </div>
-              <h3>
-                {mission.id}
-                <span>{mission.title}</span>
-              </h3>
-              <p>{mission.description}</p>
-            </Link>
+              <h3>{item.name}</h3>
+              <h4>{item.question}</h4>
+              <p>{item.detail}</p>
+            </article>
           ))}
         </div>
+        <p className="intro-boundary">
+          Inclusion, execution, network finality, and profit are different
+          concepts. This invented simulation explores the first two; it does not
+          predict trading results.
+        </p>
       </section>
-      <section className="bottom-callout page-width">
+      <div className="page-width">
+        <Glossary />
+      </div>
+      <section className="bottom-callout page-width landing-callout">
         <div>
-          <span className="eyebrow">A SMALL SIMULATION. A BIGGER PICTURE.</span>
-          <h2>Curiosity is your edge.</h2>
+          <p className="eyebrow">
+            {onboarding.choice || progress.lastRun
+              ? "YOUR JOURNEY CONTINUES"
+              : "NO ACCOUNT. NO PRESSURE."}
+          </p>
+          <h2>
+            {onboarding.displayName
+              ? `Your next block, ${onboarding.displayName}.`
+              : "A little curiosity goes a long way."}
+          </h2>
+          <p>
+            Your progress stays on this device. Start fresh any time in the
+            tutorial.
+          </p>
         </div>
         <Link
-          to={progress.lastRun ? "/results" : "/about"}
-          className="text-link"
+          to={progress.lastRun ? "/results" : "/tutorial"}
+          className="button primary"
         >
           {progress.lastRun
-            ? "Revisit your last run"
-            : "What’s behind the game"}{" "}
-          <span aria-hidden="true">
-            <Arrow />
-          </span>
+            ? "View my last run"
+            : onboarding.choice
+              ? "Continue learning"
+              : "Try the first example"}
+          <Arrow />
         </Link>
       </section>
     </>

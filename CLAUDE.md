@@ -10,6 +10,10 @@ Preserve these requirements in future stages. This is a community-built educatio
 - Use localStorage only for personal progress. Gracefully handle unavailable or corrupt storage. No wallet, real trades, tokens, payments, rewards, or backend in this stage.
 - Use lightweight CSS/SVG animation, responsive layouts, visible keyboard focus, semantic controls, and reduced-motion support.
 - Mark unfinished gameplay explicitly as development placeholders. Maintain `docs/BUILD_STATUS.md` with completed work and remaining scope.
+- Landing title: “Inside the Block”; eyebrow: “A community experience exploring Raiku”; headline: “You spotted the opportunity. Can your strategy act in time?”; supporting copy: “Explore how information, decisions, and execution shape a trade—in a short interactive simulation.” Primary CTA “Enter the Block”, secondary “How it works”.
+- Guest play must work without registration. An optional display name is limited to 24 characters and stored only on this device as personal progress, alongside tutorial choice/replay position. Do not collect a wallet, email, or X account. Reset must clear name, tutorial, and game progress.
+- Beginner tutorial: executed event → later observation → Act or Pass → self-paced explanatory replay. Keep this model independent of React. Never use animation or a countdown to gate decisions or reading.
+- Explain block, validator, signal age, inclusion, and net result using short explanations available by keyboard and tap/click, never hover alone. Interactive targets must be at least 44px, and layouts must fit a 360px viewport.
 
 ## Brand and accessibility
 

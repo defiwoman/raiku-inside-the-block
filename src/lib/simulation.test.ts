@@ -1,8 +1,30 @@
 import { describe, expect, it } from "vitest";
-import { isChoices, missions, simulate } from "./simulation";
+import { isChoices, missions, simulate, simulateTutorial } from "./simulation";
 import type { Choices } from "./simulation";
 
 describe("illustrative simulation", () => {
+  it("shows how a delayed observation and response can lead to inclusion without successful execution", () => {
+    const result = simulateTutorial("act");
+    expect(result).toMatchObject({
+      signalAge: 120,
+      arrivedAt: 240,
+      submitted: true,
+      included: true,
+      executed: false,
+    });
+    expect(result.steps.map((step) => step.tick)).toEqual([0, 120, 160, 240]);
+  });
+  it("never treats passing as a submission or invented profit", () => {
+    const result = simulateTutorial("pass");
+    expect(result).toMatchObject({
+      submitted: false,
+      included: false,
+      executed: false,
+      arrivedAt: null,
+    });
+    expect(result).not.toHaveProperty("profit");
+    expect(result.steps.map((step) => step.tick)).toEqual([0, 120, 120, 120]);
+  });
   it("models an included and executed considered order", () => {
     expect(simulate(["earlier", "check", "eligible"])).toMatchObject({
       observation: 40,

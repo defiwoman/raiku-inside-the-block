@@ -1,5 +1,6 @@
 import { isChoices, simulate } from "./simulation";
 import type { RunResult } from "./simulation";
+import { ONBOARDING_KEY } from "./onboarding";
 
 const KEY = "raiku-inside-the-block:progress:v1";
 export interface Progress {
@@ -57,6 +58,7 @@ export function saveRun(run: RunResult): {
 export function clearProgress(): boolean {
   try {
     localStorage.removeItem(KEY);
+    localStorage.removeItem(ONBOARDING_KEY);
     return true;
   } catch {
     return false;
