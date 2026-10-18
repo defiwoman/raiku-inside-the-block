@@ -25,6 +25,14 @@ Preserve these requirements in future stages. This is a community-built educatio
 - A dropped, never-included transaction pays no network execution fee. Explain the disclosed fee for included failures. Keep operating costs and forgone opportunity separate; passing has zero trade P&L and actual costs.
 - Scoring uses only what could be known when choosing, with no hindsight penalty. Show exact category points after each round. Compare only matching scenario versions and seeds. Preserve `docs/SIMULATION_RULES.md`; bump the scenario version when data, rules, seed mapping, event ordering, or scoring changes.
 
+## Results, replay, and sharing
+
+- After each completed round, provide Play/Pause, step backward/forward, replay from the beginning, and a reduced-motion full text timeline. Display only recorded engine events; playback does not advance or recalculate the simulation. Label executed event, strategy observation, player decision, submission arrival, and inclusion/execution outcome. Mark non-applicable stages honestly for Pass/drop.
+- Use “What you knew”, “What you chose”, “What happened”, and “What to notice next time”. Results show overall and SEE/ACT/LAND scores separately from simulated net, one useful decision-based lesson, any-round replay, Try again, and Reset.
+- Label device-only personal best/history “Your local best”. Compare only matching version/seed records. Never describe results as real trading skill, certified expertise, or investment performance.
+- Export 1200×630 PNG cards locally with paper/ink, optional name, actual score/mission breakdown, community disclaimer, and a short challenge. Use original logo proportions if the official local asset is available; otherwise retain the plain-text title and report the missing asset. App URLs are included only from a valid explicit production configuration (`VITE_PUBLIC_APP_URL`), never inferred from browser/preview origins.
+- Sharing is optional and user-initiated: Download card, Copy result text, and a text-only X composer link. Never automatically post or upload; explain that the user must attach the downloaded image manually. Keep name, history, and export generation local.
+
 ## Brand and accessibility
 
 - Paper `#EFEEE9`, ink `#223D0E`, deep ink `#0F1D06`. Keep shared design tokens in CSS variables.

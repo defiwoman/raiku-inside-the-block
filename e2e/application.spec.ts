@@ -118,15 +118,15 @@ test("complete tutorial, play, download, reload, replay, and clear progress", as
     page.getByText("SCENARIO 3.0.0 · SEED 42", { exact: true }),
   ).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download share card" }).click();
+  await page.getByRole("button", { name: "Download card" }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe("raiku-inside-the-block.svg");
-  await download.saveAs(`/tmp/raiku-share-${test.info().project.name}.svg`);
+  expect(download.suggestedFilename()).toBe("raiku-inside-the-block.png");
+  await download.saveAs(`/tmp/raiku-share-${test.info().project.name}.png`);
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "Your decisions, unpacked." }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Replay this seed" }).click();
+  await page.getByRole("link", { name: "Try again with this seed" }).click();
   await expect(
     page.getByRole("button", { name: "Act · submit", exact: true }),
   ).toBeVisible();

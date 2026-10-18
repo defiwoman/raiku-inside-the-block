@@ -38,3 +38,7 @@ These are authored teaching scenarios, not measured live outcomes. No network fi
 Run `npm ci`, `npm run build`, and `npm test`. The production output is `dist/`. Browser checks use `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e` when Chromium is installed at that path.
 
 Successful local builds and browser tests do not mean the site is deployed. A GitHub push only makes the source available for Netlify to build. Netlify account access and an actual successful deployment are still needed to obtain a public site URL.
+
+## Optional production URL on share cards
+
+After you have a verified production site URL, optionally set the public build variable `VITE_PUBLIC_APP_URL` in Netlify and redeploy. It is not required to build or play. Do not use a deploy-preview URL or a local development address. When unset or invalid, PNG cards and copied/X result text omit the app URL entirely. Sharing never infers an address from the browser. This setting does not create or validate a Netlify deployment.

@@ -16,6 +16,7 @@ import { About } from "./pages/About";
 import "./styles.css";
 import "./onboarding.css";
 import "./simulation.css";
+import "./results.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

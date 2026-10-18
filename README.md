@@ -20,3 +20,5 @@ See [CLAUDE.md](CLAUDE.md) for product/content requirements and [docs/BUILD_STAT
 Community-built educational simulation. Not affiliated with or endorsed by Raiku.
 
 The versioned simulation rules and exact scoring rubric are documented in [docs/SIMULATION_RULES.md](docs/SIMULATION_RULES.md). The default run uses scenario 3.0.0, seed 42, and invented integer credits. Compare scores only within the same version and seed.
+
+Results include recorded-event playback, a reduced-motion text timeline, your local best history, and a locally generated 1200×630 PNG card. Sharing is optional; the X link opens a text composer and does not upload the image. To include a public app URL in cards/text, explicitly set `VITE_PUBLIC_APP_URL` to the verified production HTTPS address and rebuild. Leave it unset for no URL; `.env.example` contains no default. The official logo remains unavailable, so the card retains a plain-text title.

@@ -1,22 +1,43 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { RoundReview } from "../components/RoundReview";
-import { bestFor, readProgress } from "../lib/progress";
-import { missions, readRun } from "../lib/simulation";
+import {
+  bestFor,
+  bestHistoryFor,
+  clearProgress,
+  readProgress,
+} from "../lib/progress";
+import { SharePanel } from "../components/SharePanel";
+import { missionBreakdown, runLesson } from "../lib/results";
+import { readRun } from "../lib/simulation";
 import { signedCredits, credits } from "../lib/presentation";
-import { downloadShareCard } from "../lib/share";
 
 export function Results() {
   const location = useLocation();
-  const progress = readProgress();
-  const run = readRun(location.state?.run) ?? progress.lastRun;
+  const navigate = useNavigate();
+  const progress = useMemo(readProgress, [location.key]);
+  const run = useMemo(
+    // Saved records are authoritative; stale history cannot restore cleared progress.
+    // Route state is used only when browser storage was unavailable during play.
+    () =>
+      (location.state?.persisted === false
+        ? readRun(location.state?.run)
+        : null) ?? progress.lastRun,
+    [location.state, progress.lastRun],
+  );
   const [roundIndex, setRoundIndex] = useState(0);
-  const [downloaded, setDownloaded] = useState(false);
+  const [resetMessage, setResetMessage] = useState("");
   if (!run)
     return (
       <section className="page-width inner-page empty-state">
         <p className="eyebrow">THE STORY IS YOURS TO START</p>
         <h1>A block of possibilities.</h1>
+        {location.state?.reset && (
+          <p role="status">
+            Local progress reset. Your name, tutorial, runs, and local best
+            history have been cleared from this device.
+          </p>
+        )}
         <p>
           Complete all nine rounds across SEE, ACT, and LAND to view your
           decision scores, simulated ledger, event replays, and share card.
@@ -33,6 +54,18 @@ export function Results() {
       </section>
     );
   const best = bestFor(run.config);
+  const history = bestHistoryFor(run.config);
+  const breakdown = missionBreakdown(run);
+  const lesson = runLesson(run);
+  function reset() {
+    if (!clearProgress()) {
+      setResetMessage(
+        "Your browser blocked access to saved progress. It could not be reset.",
+      );
+      return;
+    }
+    navigate("/results", { replace: true, state: { reset: true } });
+  }
   return (
     <section className="page-width inner-page results-page nine-results">
       <div className="page-heading">
@@ -74,7 +107,7 @@ export function Results() {
           </div>
           <small>
             {best !== null
-              ? `Best for this exact version and seed: ${best} / 90.`
+              ? `Your local best: ${best} / ${run.maxScore} for this exact version and seed.`
               : "No saved comparison for this exact version and seed."}{" "}
             No comparisons with other seeds or versions.
           </small>
@@ -116,31 +149,96 @@ export function Results() {
         </section>
       </div>
       <div className="mission-totals">
-        {missions.map((mission) => {
-          const rounds = run.rounds.filter(
-            (round) => round.mission === mission.id,
-          );
-          return (
-            <section key={mission.id}>
-              <span className="eyebrow">{mission.id} / THREE ROUNDS</span>
-              <h2>
-                {rounds.reduce((sum, round) => sum + round.score.total, 0)}{" "}
-                <small>/ 30 points</small>
-              </h2>
-              <p>
-                {signedCredits(
-                  rounds.reduce(
-                    (sum, round) => sum + round.ledger.netResult,
-                    0,
-                  ),
-                )}{" "}
-                simulated net
-              </p>
-            </section>
-          );
-        })}
+        {breakdown.map((mission) => (
+          <section key={mission.id}>
+            <span className="eyebrow">{mission.id} / THREE ROUNDS</span>
+            <h2>
+              {mission.score} <small>/ {mission.max} points</small>
+            </h2>
+            <p>{signedCredits(mission.net)} simulated net</p>
+          </section>
+        ))}
       </div>
-      <section className="full-run-replay" aria-label="Completed round replays">
+      <section className="result-lesson-panel" aria-label="One useful lesson">
+        <span className="eyebrow">ONE USEFUL LESSON FROM YOUR DECISIONS</span>
+        <h2>{lesson.title}</h2>
+        <p>{lesson.body}</p>
+        <button
+          type="button"
+          className="text-link"
+          onClick={() => {
+            setRoundIndex(lesson.roundIndex);
+            document
+              .getElementById("completed-replays")
+              ?.scrollIntoView({ behavior: "instant", block: "start" });
+          }}
+        >
+          Review {lesson.mission} round {(lesson.roundIndex % 3) + 1}
+        </button>
+      </section>
+      <section
+        className="local-best-panel"
+        aria-labelledby="local-best-heading"
+      >
+        <div>
+          <p className="eyebrow">ON THIS DEVICE ONLY</p>
+          <h2 id="local-best-heading">Your local best</h2>
+          <p>
+            {best === null
+              ? "This run was not saved, so no local best is available."
+              : `${best}/${run.maxScore} learning points for scenario ${run.config.version}, seed ${run.config.seed}.`}{" "}
+            This is your personal history, not a global leaderboard. Compare
+            only the same version and seed.
+          </p>
+        </div>
+        {history.length > 0 && (
+          <ol aria-label="Personal best history">
+            {history.map((entry, index) => (
+              <li key={index}>
+                <span>
+                  {entry.runNumber === null
+                    ? "Saved best"
+                    : `Saved run ${entry.runNumber}`}
+                </span>
+                <strong>
+                  {entry.score}/{entry.maxScore}
+                </strong>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+      <div className="results-actions">
+        <Link
+          className="button primary"
+          to={`/game?seed=${run.config.seed}`}
+          aria-label="Try again with this seed"
+        >
+          Try again · same seed <span aria-hidden="true">↻</span>
+        </Link>
+        <button type="button" className="button secondary" onClick={reset}>
+          Reset local progress
+        </button>
+      </div>
+      <p className="reset-explanation">
+        Reset removes your name, tutorial, saved runs, and local best history on
+        this device.
+      </p>
+      <p className="share-status" role="status">
+        {resetMessage}
+      </p>
+      {location.state?.persisted === false && (
+        <p className="content-note" role="status">
+          Your browser blocked local storage. These results are available in
+          this tab, but are not saved for reload.
+        </p>
+      )}
+      <SharePanel run={run} />
+      <section
+        id="completed-replays"
+        className="full-run-replay"
+        aria-label="Completed round replays"
+      >
         <div className="section-heading">
           <h2>Replay any completed round.</h2>
           <span className="mono">ALL EVENTS NOW REVEALED</span>
@@ -165,32 +263,6 @@ export function Results() {
           round={run.rounds[roundIndex]}
         />
       </section>
-      <div className="results-actions">
-        <Link className="button primary" to={`/game?seed=${run.config.seed}`}>
-          Replay this seed ↻
-        </Link>
-        <button
-          type="button"
-          className="button secondary"
-          onClick={() => {
-            downloadShareCard(run);
-            setDownloaded(true);
-          }}
-        >
-          Download share card ↓
-        </button>
-        <span className="mono" role="status">
-          {downloaded
-            ? "SVG CARD DOWNLOADED"
-            : `VERSION ${run.config.version} · SEED ${run.config.seed}`}
-        </span>
-      </div>
-      {location.state?.persisted === false && (
-        <p className="content-note" role="status">
-          Your browser blocked local storage. These results are available in
-          this tab, but are not saved for reload.
-        </p>
-      )}
       <p className="development-label">
         Authored teaching scenarios. All ticks and credits are illustrative.
         Inclusion, successful execution, finality, and profit are different

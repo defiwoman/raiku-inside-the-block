@@ -13,6 +13,10 @@ const KEY = "raiku-inside-the-block:progress:v2";
 const LEGACY_KEY = "raiku-inside-the-block:progress:v1";
 const DRAFT_KEY = "raiku-inside-the-block:game:v3";
 type Snapshot = { config: RunConfig; actions: PlayerAction[] };
+interface BestRecord {
+  runNumber: number;
+  record: Snapshot;
+}
 export interface Progress {
   completedRuns: number;
   bestScore: number;
@@ -26,12 +30,14 @@ function loadStore(): {
   completedRuns: number;
   lastRun: RunResult | null;
   best: Record<string, Snapshot>;
+  history: BestRecord[];
   legacyAvailable: boolean;
 } {
   const empty = {
     completedRuns: 0,
     lastRun: null,
     best: {},
+    history: [],
     legacyAvailable: false,
   };
   try {
@@ -51,10 +57,23 @@ function loadStore(): {
         const run = readRun(value);
         if (run) best[comparisonKey(run.config)] = snapshot(run);
       }
+    const history: BestRecord[] = [];
+    if (Array.isArray(data.history))
+      for (const entry of data.history.slice(-20)) {
+        const run = readRun(entry?.record);
+        if (
+          run &&
+          Number.isSafeInteger(entry.runNumber) &&
+          entry.runNumber > 0 &&
+          entry.runNumber <= data.completedRuns
+        )
+          history.push({ runNumber: entry.runNumber, record: snapshot(run) });
+      }
     return {
       completedRuns: data.completedRuns,
       lastRun,
       best,
+      history,
       legacyAvailable,
     };
   } catch {
@@ -77,6 +96,27 @@ export function bestFor(config: RunConfig): number | null {
   const run = readRun(loadStore().best[comparisonKey(config)]);
   return run && canCompare(run.config, config) ? run.score : null;
 }
+export function bestHistoryFor(
+  config: RunConfig,
+): { runNumber: number | null; score: number; maxScore: number }[] {
+  const data = loadStore();
+  const entries = data.history.flatMap((entry) => {
+    const run = readRun(entry.record);
+    return run && canCompare(run.config, config)
+      ? [
+          {
+            runNumber: entry.runNumber as number | null,
+            score: run.score,
+            maxScore: run.maxScore,
+          },
+        ]
+      : [];
+  });
+  const best = readRun(data.best[comparisonKey(config)]);
+  if (!entries.length && best)
+    return [{ runNumber: null, score: best.score, maxScore: best.maxScore }];
+  return entries;
+}
 export function saveRun(input: RunResult): {
   progress: Progress;
   persisted: boolean;
@@ -96,6 +136,13 @@ export function saveRun(input: RunResult): {
     bestScore: readRun(best[key])!.score,
     legacyAvailable: previous.legacyAvailable,
   };
+  const history =
+    !existing || run.score > existing.score
+      ? [
+          ...previous.history,
+          { runNumber: progress.completedRuns, record: snapshot(run) },
+        ].slice(-20)
+      : previous.history;
   try {
     localStorage.setItem(
       KEY,
@@ -103,6 +150,7 @@ export function saveRun(input: RunResult): {
         completedRuns: progress.completedRuns,
         lastRun: snapshot(run),
         best,
+        history,
       }),
     );
     localStorage.removeItem(DRAFT_KEY);

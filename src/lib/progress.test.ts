@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   bestFor,
+  bestHistoryFor,
   clearProgress,
   readDraft,
   readProgress,
@@ -22,6 +23,26 @@ describe("versioned personal progress", () => {
     });
   });
   afterEach(() => vi.unstubAllGlobals());
+  it("keeps only improvements in local best history and separates seeds", () => {
+    const low = simulateRun(
+      DEFAULT_CONFIG,
+      Array.from({ length: 9 }, () => ({ kind: "pass" })),
+    );
+    saveRun(low);
+    saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions()));
+    saveRun(low);
+    const other = { ...DEFAULT_CONFIG, seed: 9 };
+    saveRun(simulateRun(other, sensibleActions(other)));
+    expect(bestHistoryFor(DEFAULT_CONFIG)).toEqual([
+      { runNumber: 1, score: low.score, maxScore: 90 },
+      { runNumber: 2, score: 90, maxScore: 90 },
+    ]);
+    expect(bestHistoryFor(other)).toEqual([
+      { runNumber: 4, score: 90, maxScore: 90 },
+    ]);
+    expect(clearProgress()).toBe(true);
+    expect(bestHistoryFor(DEFAULT_CONFIG)).toEqual([]);
+  });
   it("recomputes stored results and keeps best scores only for matching seed and version", () => {
     saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions()));
     const another = { ...DEFAULT_CONFIG, seed: 43 };

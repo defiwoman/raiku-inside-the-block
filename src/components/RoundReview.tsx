@@ -1,4 +1,6 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { EventReplay } from "./EventReplay";
+import { roundNarrative } from "../lib/results";
 import type { RoundResult } from "../lib/simulation";
 import { credits, signedCredits, statusLabel } from "../lib/presentation";
 
@@ -9,8 +11,7 @@ export function RoundReview({
   round: RoundResult;
   children?: ReactNode;
 }) {
-  const [eventIndex, setEventIndex] = useState(0);
-  const event = round.events[eventIndex];
+  const narrative = roundNarrative(round);
   const pathId = round.action.kind === "act" ? round.action.pathId : null;
   const selectedPath = round.decision.paths.find((path) => path.id === pathId);
   return (
@@ -102,53 +103,25 @@ export function RoundReview({
           </ol>
         </section>
       </div>
-      <details className="event-replay" aria-label="Engine event replay">
-        <summary>Replay recorded events</summary>
-        <div className="section-heading">
-          <h3>Replay the engine events.</h3>
-          <span className="mono">
-            ILLUSTRATIVE TICKS · {eventIndex + 1} / {round.events.length}
-          </span>
-        </div>
-        <div className="event-markers" aria-label="Replay event selection">
-          {round.events.map((item, index) => (
-            <button
-              type="button"
-              key={`${item.kind}-${index}`}
-              aria-label={`Event ${index + 1}: ${item.title}`}
-              aria-current={index === eventIndex ? "step" : undefined}
-              onClick={() => setEventIndex(index)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-        <div className="replay-event-card" key={eventIndex}>
-          <span className="eyebrow">
-            TICK {event.tick} / {event.kind}
-          </span>
-          <h4>{event.title}</h4>
-          <p>{event.detail}</p>
-        </div>
-        <div className="replay-controls">
-          <button
-            type="button"
-            className="button secondary"
-            disabled={eventIndex === 0}
-            onClick={() => setEventIndex(eventIndex - 1)}
-          >
-            Previous event
-          </button>
-          <button
-            type="button"
-            className="button secondary"
-            disabled={eventIndex === round.events.length - 1}
-            onClick={() => setEventIndex(eventIndex + 1)}
-          >
-            Next event
-          </button>
-        </div>
-      </details>
+      <section className="round-story" aria-label="Round in plain language">
+        <article>
+          <h3>What you knew</h3>
+          <p>{narrative.knew}</p>
+        </article>
+        <article>
+          <h3>What you chose</h3>
+          <p>{narrative.chose}</p>
+        </article>
+        <article>
+          <h3>What happened</h3>
+          <p>{narrative.happened}</p>
+        </article>
+        <article>
+          <h3>What to notice next time</h3>
+          <p>{narrative.next}</p>
+        </article>
+      </section>
+      <EventReplay key={round.roundId} round={round} />
     </div>
   );
 }
