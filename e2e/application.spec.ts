@@ -1,4 +1,50 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function finishNineRounds(page: Page, allPass = false) {
+  for (let index = 0; index < 9; index++) {
+    await expect(
+      page.getByText(`RUN ${index + 1} OF 9`, { exact: false }),
+    ).toBeVisible();
+    const pass = allPass || [1, 2, 4].includes(index);
+    if (!pass && [6, 7].includes(index))
+      await page
+        .getByRole("radio", { name: /Raiku co-location example/ })
+        .check();
+    if (index === 8)
+      await expect(
+        page.getByRole("radio", { name: /Raiku co-location example/ }),
+      ).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: pass ? "Pass · no trade" : "Act · submit",
+        exact: true,
+      })
+      .click();
+    await expect(
+      page.getByText("ROUND CONTRIBUTION:", { exact: false }),
+    ).toBeVisible();
+    if (index === 7 && !allPass) {
+      await expect(
+        page.getByRole("heading", { name: "Included · execution succeeded" }),
+      ).toBeVisible();
+      await page.screenshot({
+        path: `/tmp/raiku-land-review-${test.info().project.name}.png`,
+        fullPage: true,
+      });
+    }
+    await page
+      .getByRole("button", {
+        name:
+          index === 8
+            ? "See full run results"
+            : [2, 5].includes(index)
+              ? `Continue to ${index === 2 ? "ACT" : "LAND"}`
+              : "Next round",
+        exact: true,
+      })
+      .click();
+  }
+}
 
 test("header navigation and direct tutorial refresh render the existing application", async ({
   page,
@@ -60,19 +106,17 @@ test("complete tutorial, play, download, reload, replay, and clear progress", as
     }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Start the three missions" }).click();
+  await page.screenshot({
+    path: `/tmp/raiku-game-${test.info().project.name}.png`,
+    fullPage: true,
+  });
+  await finishNineRounds(page);
   await expect(
-    page.getByRole("button", { name: "Continue to ACT" }),
-  ).toBeDisabled();
-  await page.getByRole("radio", { name: /Earlier observation/ }).check();
-  await page.getByRole("button", { name: "Continue to ACT" }).click();
-  await page.getByRole("radio", { name: /Check, then submit/ }).check();
-  await page.getByRole("button", { name: "Continue to LAND" }).click();
-  await page.getByRole("radio", { name: /Eligible reserved path/ }).check();
-  await page.getByRole("button", { name: "Reveal my result" }).click();
-  await expect(
-    page.getByRole("heading", { name: "The pieces came together." }),
+    page.getByRole("heading", { name: "Your decisions, unpacked." }),
   ).toBeVisible();
-  await expect(page.getByText("1 LOCAL RUN · BEST 100/100")).toBeVisible();
+  await expect(
+    page.getByText("SCENARIO 3.0.0 · SEED 42", { exact: true }),
+  ).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download share card" }).click();
   const download = await downloadPromise;
@@ -80,12 +124,12 @@ test("complete tutorial, play, download, reload, replay, and clear progress", as
   await download.saveAs(`/tmp/raiku-share-${test.info().project.name}.svg`);
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: "The pieces came together." }),
+    page.getByRole("heading", { name: "Your decisions, unpacked." }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Play another block" }).click();
+  await page.getByRole("link", { name: "Replay this seed" }).click();
   await expect(
-    page.getByRole("button", { name: "Continue to ACT" }),
-  ).toBeDisabled();
+    page.getByRole("button", { name: "Act · submit", exact: true }),
+  ).toBeVisible();
   await page.goto("/about");
   await page.getByRole("button", { name: "Clear my local progress" }).click();
   await expect(page.getByRole("status")).toHaveText(
@@ -346,22 +390,60 @@ test("blocked local storage still permits playing and viewing results", async ({
     });
   });
   await page.goto("/game");
-  await page.getByRole("radio", { name: /Earlier observation/ }).check();
-  await page.getByRole("button", { name: "Continue to ACT" }).click();
-  await page.getByRole("radio", { name: /Submit immediately/ }).check();
-  await page.getByRole("button", { name: "Continue to LAND" }).click();
-  await page.getByRole("radio", { name: /Eligible reserved path/ }).check();
-  await page.getByRole("button", { name: "Reveal my result" }).click();
+  await finishNineRounds(page, true);
   await expect(
     page.getByText("Your browser blocked local storage.", { exact: false }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Every choice tells a story." }),
+    page.getByRole("heading", { name: "Your decisions, unpacked." }),
+  ).toBeVisible();
+});
+
+// The decision projection must stay unchanged while the player reads; later events are absent.
+test("decisions pause ticks, hide later market events, and resume exact round reviews", async ({
+  page,
+}) => {
+  await page.goto("/game?seed=42");
+  const decision = page.getByText("DECISION PAUSED AT TICK 6", { exact: true });
+  await expect(decision).toBeVisible();
+  await page.waitForTimeout(400);
+  await expect(decision).toHaveText("DECISION PAUSED AT TICK 6");
+  await page.getByRole("button", { name: "Act · submit", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("heading", { name: "A recent observation", exact: true }),
+  ).toBeFocused();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Included · execution succeeded" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Next round", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByText("DECISION PAUSED AT TICK 70", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText(
-      "Your order was included, but its execution limit was not met.",
-      { exact: false },
-    ),
+    page.getByText("Another executed event changes the market", {
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Pass · no trade", exact: true })
+    .click();
+  await page.getByText("Replay recorded events", { exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: "Event 2: Another executed event changes the market",
+    })
+    .click();
+  await expect(
+    page.getByRole("heading", {
+      name: "Another executed event changes the market",
+    }),
   ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

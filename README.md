@@ -1,6 +1,6 @@
 # Raiku: Inside the Block
 
-A mobile-friendly community educational game about observation, decisions, and transaction inclusion. Built with React, TypeScript, and Vite. No wallet or backend.
+A mobile-friendly community educational game with nine deterministic rounds about observation, decisions after costs, and transaction execution. Built with React, TypeScript, and Vite. No wallet or backend.
 
 ```sh
 npm ci
@@ -18,3 +18,5 @@ If Chromium is already installed, use `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/
 See [CLAUDE.md](CLAUDE.md) for product/content requirements and [docs/BUILD_STATUS.md](docs/BUILD_STATUS.md) for implementation status. `src/lib/simulation.ts` is an invented, deterministic teaching model; ticks are not real latency measurements.
 
 Community-built educational simulation. Not affiliated with or endorsed by Raiku.
+
+The versioned simulation rules and exact scoring rubric are documented in [docs/SIMULATION_RULES.md](docs/SIMULATION_RULES.md). The default run uses scenario 3.0.0, seed 42, and invented integer credits. Compare scores only within the same version and seed.

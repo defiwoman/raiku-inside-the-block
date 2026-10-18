@@ -7,9 +7,9 @@ export function downloadShareCard(run: RunResult) {
     <g fill="#223D0E" font-family="Arial, sans-serif">
       <text x="75" y="100" font-size="25" font-weight="bold">RAIKU: INSIDE THE BLOCK</text>
       <text x="75" y="220" font-size="67">A little timing.</text><text x="75" y="295" font-size="67">A new perspective.</text>
-      <text x="75" y="380" font-size="24">SEE → ACT → LAND · Learning score ${run.score}/100</text>
-      <text x="75" y="430" font-size="24">Simulated inclusion: ${run.included ? "yes" : "no"} · Execution: ${run.executed ? "yes" : "no"}</text>
-      <text x="75" y="508" font-size="18">Illustrative community simulation. No live performance or profit claims.</text>
+      <text x="75" y="380" font-size="24">SEE → ACT → LAND · Learning score ${run.score}/${run.maxScore}</text>
+      <text x="75" y="430" font-size="24">Nine rounds · Scenario ${run.config.version} · Seed ${run.config.seed}</text>
+      <text x="75" y="508" font-size="18">Illustrative ticks and credits. Learning score is separate from simulated P&amp;L.</text>
       <text x="75" y="550" font-size="16">Community-built educational simulation. Not affiliated with or endorsed by Raiku.</text>
     </g>
     <g fill="none" stroke="#223D0E" stroke-width="2"><path d="M950 140l100 58v116l-100 58-100-58V198z M850 198l100 58 100-58 M950 256v116"/></g>

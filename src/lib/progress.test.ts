@@ -1,8 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { clearProgress, readProgress, saveRun } from "./progress";
-import { simulate } from "./simulation";
+import {
+  bestFor,
+  clearProgress,
+  readDraft,
+  readProgress,
+  saveDraft,
+  saveRun,
+} from "./progress";
+import { DEFAULT_CONFIG, simulateRun } from "./simulation";
+import { sensibleActions } from "./test-fixtures";
 
-describe("personal progress", () => {
+// Fixtures are action records; outcomes are always recomputed through the actual engine.
+describe("versioned personal progress", () => {
   let items: Map<string, string>;
   beforeEach(() => {
     items = new Map();
@@ -13,27 +22,61 @@ describe("personal progress", () => {
     });
   });
   afterEach(() => vi.unstubAllGlobals());
-  it("persists only personal progress and keeps the best score across runs", () => {
-    saveRun(simulate(["earlier", "check", "eligible"]));
-    saveRun(simulate(["standard", "rush", "queue"]));
-    expect(readProgress()).toMatchObject({ completedRuns: 2, bestScore: 100 });
-    expect(items.size).toBe(1);
-    expect(clearProgress()).toBe(true);
+  it("recomputes stored results and keeps best scores only for matching seed and version", () => {
+    saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions()));
+    const another = { ...DEFAULT_CONFIG, seed: 43 };
+    saveRun(
+      simulateRun(
+        another,
+        Array.from({ length: 9 }, () => ({ kind: "pass" })),
+      ),
+    );
+    expect(bestFor(DEFAULT_CONFIG)).toBe(90);
+    expect(bestFor(another)).toBeLessThan(90);
+    expect(bestFor({ ...DEFAULT_CONFIG, seed: 999 })).toBeNull();
+    expect(bestFor({ ...DEFAULT_CONFIG, version: "old" })).toBeNull();
+    expect(readProgress().completedRuns).toBe(2);
+    const data = JSON.parse(items.get("raiku-inside-the-block:progress:v2")!);
+    data.lastRun.score = 999;
+    items.set("raiku-inside-the-block:progress:v2", JSON.stringify(data));
+    expect(readProgress().lastRun?.score).not.toBe(999);
+  });
+  it("retains prototype records but never imports or compares their scores", () => {
+    items.set(
+      "raiku-inside-the-block:progress:v1",
+      JSON.stringify({ bestScore: 100 }),
+    );
+    expect(readProgress()).toMatchObject({
+      completedRuns: 0,
+      lastRun: null,
+      legacyAvailable: true,
+    });
+    saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions()));
+    expect(items.has("raiku-inside-the-block:progress:v1")).toBe(true);
+    expect(bestFor(DEFAULT_CONFIG)).toBe(90);
+  });
+  it("can resume a paused decision or review and rejects invalid draft paths", () => {
+    saveDraft({
+      config: DEFAULT_CONFIG,
+      actions: [{ kind: "pass" }],
+      reviewing: true,
+    });
+    expect(readDraft()?.reviewing).toBe(true);
+    saveDraft({
+      config: DEFAULT_CONFIG,
+      actions: [{ kind: "act", pathId: "raiku" }],
+      reviewing: true,
+    });
+    expect(readDraft()).toBeNull();
+    items.set("raiku-inside-the-block:progress:v2", "{broken");
     expect(readProgress().lastRun).toBeNull();
   });
-  it("ignores corrupt progress", () => {
-    items.set("raiku-inside-the-block:progress:v1", "{broken json");
-    expect(readProgress().completedRuns).toBe(0);
-  });
-  it("recomputes stored results instead of trusting stored outcomes", () => {
-    saveRun(simulate(["standard", "rush", "queue"]));
-    const key = [...items.keys()][0];
-    const value = JSON.parse(items.get(key)!);
-    value.lastRun.executed = true;
-    items.set(key, JSON.stringify(value));
-    expect(readProgress().lastRun?.executed).toBe(false);
-  });
-  it("allows a run to complete when browser storage is blocked", () => {
+  it("clears every generation of personal progress and handles blocked storage", () => {
+    saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions()));
+    saveDraft({ config: DEFAULT_CONFIG, actions: [], reviewing: false });
+    items.set("raiku-inside-the-block:progress:v1", "legacy");
+    expect(clearProgress()).toBe(true);
+    expect(items.size).toBe(0);
     vi.stubGlobal("localStorage", {
       getItem() {
         throw new Error("blocked");
@@ -46,11 +89,9 @@ describe("personal progress", () => {
       },
     });
     expect(readProgress().lastRun).toBeNull();
-    const { progress, persisted } = saveRun(
-      simulate(["earlier", "check", "eligible"]),
-    );
-    expect(persisted).toBe(false);
-    expect(progress.lastRun?.executed).toBe(true);
+    expect(
+      saveRun(simulateRun(DEFAULT_CONFIG, sensibleActions())).persisted,
+    ).toBe(false);
     expect(clearProgress()).toBe(false);
   });
 });

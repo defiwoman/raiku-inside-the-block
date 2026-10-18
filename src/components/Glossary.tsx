@@ -23,7 +23,7 @@ const definitions = [
   {
     term: "Net result",
     definition:
-      "What remains after gains, losses, and costs. It is not calculated in this prototype. Successful execution alone does not guarantee profit.",
+      "What remains after gains, losses, and costs. The missions model it in invented integer credits. It is separate from your learning score and is not real trading profit.",
   },
 ];
 

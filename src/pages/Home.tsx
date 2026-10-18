@@ -63,7 +63,7 @@ export function Home() {
             <span className="small-cross" aria-hidden="true">
               +
             </span>{" "}
-            Play as a guest · No wallet · About 3 minutes
+            Play as a guest · No wallet · About 3–5 minutes
           </p>
         </div>
         <div className="hero-visual">

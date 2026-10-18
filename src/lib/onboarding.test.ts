@@ -7,7 +7,7 @@ import {
   saveOnboarding,
 } from "./onboarding";
 import { clearProgress, readProgress, saveRun } from "./progress";
-import { simulate } from "./simulation";
+import { DEFAULT_CONFIG, simulateRun } from "./simulation";
 
 describe("local beginner progress", () => {
   let items: Map<string, string>;
@@ -62,7 +62,12 @@ describe("local beginner progress", () => {
     expect(readOnboarding()).toEqual(emptyOnboarding());
   });
   it("preserves existing game progress and resets both types of progress", () => {
-    saveRun(simulate(["earlier", "check", "eligible"]));
+    saveRun(
+      simulateRun(
+        DEFAULT_CONFIG,
+        Array.from({ length: 9 }, () => ({ kind: "pass" })),
+      ),
+    );
     saveOnboarding({ displayName: "Ada", choice: "act", replayStep: 3 });
     expect(readProgress().completedRuns).toBe(1);
     expect(readOnboarding().displayName).toBe("Ada");

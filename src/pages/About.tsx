@@ -65,10 +65,33 @@ export function About() {
               <dd>
                 Network finality concerns confirmation of network state. Profit
                 concerns economic outcomes, including costs and risk. Neither is
-                guaranteed by inclusion or execution, and neither is modeled
-                here.
+                guaranteed by inclusion or execution. Finality is not modeled
+                here. The missions model only an invented net result in integer
+                credits, not real profit.
               </dd>
             </dl>
+          </section>
+          <section id="simulation-rules">
+            <h2>How decision points work.</h2>
+            <p>
+              Each of nine rounds offers 10 points: 3 for information
+              discipline, 4 for net-cost discipline, and 3 for context and
+              coverage. A fresh estimate that meets the minimum acceptable net
+              supports Act. Staleness, insufficient net, or unavailable coverage
+              supports Pass. When market uncertainty is disclosed, both a viable
+              Act and cautious Pass can earn full points. A later surprise never
+              reduces a sensible decision’s score. A supported Pass earns 10/10;
+              a cautious Pass on a fresh, clear, viable estimate earns 5/10.
+            </p>
+            <p>
+              Costs use integer invented credits. A dropped transaction pays no
+              network execution fee; an included failed attempt pays the
+              disclosed 6-credit fee. Trading costs apply only on successful
+              execution. Operating costs are separate. Passing has zero trade
+              P&amp;L and actual costs; forgone opportunity is an uncharged
+              counterfactual. Compare scores only with the same scenario version
+              and seed.
+            </p>
           </section>
           <section>
             <h2>Your progress stays with you.</h2>

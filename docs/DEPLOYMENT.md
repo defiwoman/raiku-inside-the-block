@@ -27,11 +27,11 @@ The application is at the **Git repository root**. The cloud checkout is `/works
 
 The SPA rewrite is needed because React handles these routes in the browser. A static host that looks for a physical `/tutorial` file without the fallback will return 404 on refresh even though client navigation works.
 
-## What is complete, and what awaits Prompt 3?
+## Current gameplay scope
 
-Prompts 1 and 2 include the React/TypeScript/Vite foundation, five screens, responsive landing page, numbered block illustration, guest play, optional local display name, reset, glossary, and complete self-paced Act/Pass tutorial with explanatory replay. The existing three-mission prototype also produces local results and SVG share cards.
+The application includes the landing page and beginner onboarding from Prompts 1 and 2, plus all nine rounds of SEE, ACT, and LAND. The pure versioned engine resolves authored events, inclusion, successful/failed/dropped transactions, integer-credit ledgers, and decision-time scores. Each completed round has an event replay; Results can revisit all nine. Read `docs/SIMULATION_RULES.md` for the scenario version, exact costs, scoring, eligibility gates, and known simplifications.
 
-The three-mission Game and Results screens are **development prototypes awaiting further gameplay work in Prompt 3**. Full market replay, variable block schedules, and animated event-by-event Results replay are not implemented. Their current timings, market rules, and learning scores are invented. Finality and trading profit are not modeled. There is no live Raiku integration, wallet, backend, or real trading.
+These are authored teaching scenarios, not measured live outcomes. No network finality, real trades, live Raiku integration, wallet, or backend is modeled. A simulated net result is not real trading profit. Hosting settings remain unchanged.
 
 ## Validation and limits
 

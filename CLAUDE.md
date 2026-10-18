@@ -15,6 +15,16 @@ Preserve these requirements in future stages. This is a community-built educatio
 - Beginner tutorial: executed event → later observation → Act or Pass → self-paced explanatory replay. Keep this model independent of React. Never use animation or a countdown to gate decisions or reading.
 - Explain block, validator, signal age, inclusion, and net result using short explanations available by keyboard and tap/click, never hover alone. Interactive targets must be at least 44px, and layouts must fit a 360px viewport.
 
+## Simulation stage requirements
+
+- Three missions, three rounds each; target roughly 3–5 minutes without a time gate. Simulation ticks pause indefinitely during decisions and are illustrative, never real Solana milliseconds.
+- Preserve the pure deterministic TypeScript engine: the same scenario version, uint32 seed, and actions must reproduce identical results. Financial calculations use integer credits.
+- Separate scenario data, engine logic, decision-time scoring, and presentation. Animations only present recorded engine events. Never put future market events in the normal pre-decision view; published synthetic leader schedules are planning metadata.
+- SEE teaches fresh/outdated signals and a reasonable Pass. ACT teaches estimates after costs, minimum acceptable net, and unknown later market changes. LAND teaches eligible Raiku-produced block coverage, inclusion without profit, and an unavailable Raiku example in an Other-produced block.
+- Enforce path availability in the engine and UI. No named competing providers or pending-flow access. Do not force a Raiku-labelled outcome to be profitable.
+- A dropped, never-included transaction pays no network execution fee. Explain the disclosed fee for included failures. Keep operating costs and forgone opportunity separate; passing has zero trade P&L and actual costs.
+- Scoring uses only what could be known when choosing, with no hindsight penalty. Show exact category points after each round. Compare only matching scenario versions and seeds. Preserve `docs/SIMULATION_RULES.md`; bump the scenario version when data, rules, seed mapping, event ordering, or scoring changes.
+
 ## Brand and accessibility
 
 - Paper `#EFEEE9`, ink `#223D0E`, deep ink `#0F1D06`. Keep shared design tokens in CSS variables.
@@ -28,7 +38,7 @@ Preserve these requirements in future stages. This is a community-built educatio
 - This is an illustrative community simulation, not a live Raiku integration or performance benchmark.
 - Blackline reacts to **already-executed transactions**. Never depict access to pending transactions or front-running.
 - Relevant inclusion claims concern **eligible orders in Raiku-produced blocks**. Do not generalize them into universal guarantees or assert invented eligibility rules.
-- Transaction inclusion, successful execution, network finality, and trading profit are different concepts. This prototype models invented inclusion/execution outcomes; it does not model finality or profit.
+- Transaction inclusion, successful execution, network finality, and trading profit are different concepts. The missions model invented inclusion, execution, costs, and net P&L in integer credits. They do not model network finality or real trading profit.
 - Never invent APIs, partner relationships, live statistics, endorsements, rewards, or performance guarantees.
 - Include this exact footer throughout: “Community-built educational simulation. Not affiliated with or endorsed by Raiku.” Include the disclaimer on share cards too.
 
