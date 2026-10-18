@@ -1,5 +1,32 @@
 import { expect, test } from "@playwright/test";
 
+test("header navigation and direct tutorial refresh render the existing application", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", { name: "Inside the Block", exact: true }),
+  ).toBeVisible();
+  const nav = page.getByRole("navigation", { name: "Main navigation" });
+  await nav.getByRole("link", { name: "About", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "A window into the block." }),
+  ).toBeVisible();
+  await nav.getByRole("link", { name: "How to play", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "A small example. A clearer picture." }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: /Act.*Check and submit/ }),
+  ).toBeVisible();
+  await nav.getByRole("link", { name: "Overview", exact: true }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(
+    page.getByRole("heading", { name: "Inside the Block", exact: true }),
+  ).toBeVisible();
+});
+
 test("complete tutorial, play, download, reload, replay, and clear progress", async ({
   page,
 }) => {

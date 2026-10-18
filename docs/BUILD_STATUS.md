@@ -16,12 +16,15 @@
 - About: explanations of executed transactions, eligible orders in Raiku-produced blocks, inclusion, execution, finality, profit, privacy, and official reference links.
 - Locally bundled Geist and Geist Mono fonts, CSS design tokens, reduced-motion support, and SVG navigation arrows independent of font glyph coverage.
 - Project requirements preserved in `CLAUDE.md` and development/deployment instructions in `README.md`.
+- Repository inspection confirmed both combined prompt commits on branch `work`: `c0152c2` (application foundation) and `b9cb368` (landing and beginner onboarding). All expected source, style, test, lockfile, and requirements documents are tracked. Official SVGs remain the documented missing assets; advanced gameplay remains deliberate prototype scope.
+- Netlify configuration added in the repository-root `netlify.toml`: base `.`, build `npm run build`, publish `dist`, Node.js 24, and a non-forced HTTP 200 SPA rewrite from `/*` to `/index.html`. Exact publishing settings and Prompt 3 boundaries are in `docs/DEPLOYMENT.md`.
 
 ## Verification
 
 - `npm run build`: passed (TypeScript checking + production bundle).
 - `npm test`: 17 tests passed. Covers both beginner outcomes, all eight mission combinations, invalid choices, name limits and Unicode normalization, tutorial persistence/corruption, preservation of old game progress, combined reset, and unavailable storage.
-- `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`: 21 tests passed across desktop Chromium (1440px), mobile Chromium (390px), and narrow touch Chromium (360px). Covers both tutorial choices and replay focus, optional name/save/reload/reset, guest navigation, complete gameplay, SVG download, existing results persistence, clear progress, all direct routes, keyboard/Space/Enter/Escape controls, term tooltips, reduced motion, pause/resume, and blocked storage in tutorial and gameplay. No browser errors in the complete normal flow.
+- `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium npm run test:e2e`: 24 tests passed across desktop Chromium (1440px), mobile Chromium (390px), and narrow touch Chromium (360px). Covers homepage/header navigation, tutorial refresh, both tutorial choices and replay focus, optional name/save/reload/reset, guest navigation, complete prototype gameplay, SVG download, existing results persistence, clear progress, all direct routes, keyboard/Space/Enter/Escape controls, term tooltips, reduced motion, pause/resume, and blocked storage in tutorial and gameplay. No browser errors in the complete normal flow.
+- Hosting-preparation validation: a clean `npm --cache /workspace/.npm-cache ci --no-fund --no-audit`, `npm run build`, `npm test`, and the complete browser suite passed. `netlify.toml` was parsed and checked for the exact build/base/publish values and SPA rewrite. Netlify's hosted rewrite and deployment have not been validated on a live Netlify URL.
 - Browser checks verify at least 44px height and width for landing/onboarding interactive controls, plus actual text/control bounds and no horizontal page overflow at 360px. These checks do not rely on clipping to hide oversized content.
 - Desktop and mobile landing/onboarding screenshots inspected. SVG arrows and CSS playback marks avoid missing icon glyphs. Diagram captions repeat event and observation details as readable HTML on narrow screens.
 - SVG download verified through the browser download event; output is a local file, not a remote share service.
@@ -41,4 +44,4 @@ Playwright's browser download CDN was also blocked, but the existing `/usr/bin/c
 - Finality, fees, price formation, and profit are not modeled. Do not represent existing rules as real Raiku performance or eligibility conditions.
 - Download currently exports SVG; optional PNG export can be added later.
 - Perform broader assistive-technology and real-device checks before public release. Automated checks are not a complete accessibility audit.
-- Production deployment is not included. Configure static hosting to serve `index.html` for all application routes.
+- Netlify configuration is complete. Connect the GitHub repository to Netlify, choose branch `work`, and publish using `docs/DEPLOYMENT.md`. No Netlify account binding or public-preview tool is available in this environment, so no public deployment URL is claimed. GitHub API requests currently return a proxy CONNECT HTTP 403; pull-request operations are unavailable through that API here.
